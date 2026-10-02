@@ -1,0 +1,28 @@
+{
+  "monitors": [
+    {
+      "name": "example-site",
+      "url": "https://example.com",
+      "checks": ["http", "ssl"]
+    },
+    {
+      "name": "example-api",
+      "url": "https://api.example.com/health",
+      "checks": ["http"],
+      "http": {
+        "expect_status": 200,
+        "timeout_seconds": 5,
+        "interval_minutes": 10
+      }
+    },
+    {
+      "name": "example-cert-only",
+      "url": "https://cert.example.com",
+      "checks": ["ssl"],
+      "ssl": {
+        "warn_days": 30,
+        "interval_hours": 12
+      }
+    }
+  ]
+}

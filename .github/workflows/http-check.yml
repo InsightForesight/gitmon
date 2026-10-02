@@ -1,0 +1,48 @@
+name: HTTP Check
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: gitmon-http
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: .gitmon-state.json
+          key: gitmon-state-v1-${{ github.run_id }}
+          restore-keys: gitmon-state-v1-
+
+      - name: Write monitor config from secret
+        run: printf '%s' "$MONITORS_CONFIG" > monitors.json
+        env:
+          MONITORS_CONFIG: ${{ secrets.MONITORS_CONFIG }}
+
+      - name: Run HTTP checks
+        run: node src/check-http.mjs
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_URL: ${{ secrets.NTFY_URL }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+          FEISHU_SECRET: ${{ secrets.FEISHU_SECRET }}
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: .gitmon-state.json
+          key: gitmon-state-v1-${{ github.run_id }}

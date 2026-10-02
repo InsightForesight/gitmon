@@ -1,0 +1,9 @@
+{
+  "name": "gitmon",
+  "private": true,
+  "type": "module",
+  "description": "Monitor websites on GitHub Actions.",
+  "engines": {
+    "node": ">=20"
+  }
+}
